@@ -17,7 +17,6 @@ const getDelta = (newFilePath, sign, partSize) => {
         const part = file.slice(start, end);
 
         if (!part.length) {
-            console.log('命中率:', Math.round(((hit / sign.size) * 10000)) / 100.00.toFixed(2) + '%')
             return baseutils.handleCheckResult(checkResult, hit / sign.size)
         }
 

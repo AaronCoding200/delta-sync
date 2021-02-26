@@ -10,7 +10,9 @@ const api = axios.create({
     }
 });
 
-// 获取上传url
+/**
+ * 获取上传url
+ */
 const getUploadUrl = async () => {
     const projectId = '4vdhw9xZQLV'
     const folderId = '@root'
@@ -26,7 +28,9 @@ const getUploadUrl = async () => {
     return {uploadUrl: data.data.uploadUrl, signature: data.data.signature}
 }
 
-// 全量上传
+/**
+ * 全量上传
+ */
 const fullUpload = async (url, signature, filePath) => {
     const formData = new FormData({maxDataSize: 5 * 1024 * 1024 * 1024});
     formData.append('file', fs.createReadStream(filePath));
@@ -40,7 +44,9 @@ const fullUpload = async (url, signature, filePath) => {
     return data
 }
 
-// 上传sign文件
+/**
+ * 上传sign文件
+ */
 const uploadSign = async (fileId, signStr) => {
     const formData = new FormData({maxDataSize: 5 * 1024 * 1024 * 1024});
     formData.append('fileId', fileId);
@@ -51,7 +57,9 @@ const uploadSign = async (fileId, signStr) => {
     });
 };
 
-// 下载sign文件
+/**
+ * 下载sign文件
+ */
 const downloadSign = async (fileId) => {
     const {data} = await api.get('/bimserver/sfs/v3/delta/downloadSign', {
         params: {fileId}
@@ -59,7 +67,9 @@ const downloadSign = async (fileId) => {
     return data;
 }
 
-// 上传差异文件
+/**
+ * 上传差异文件
+ */
 const uploadDelta = async (fileId, deltaNum, deltaFile) => {
 
     const formData = new FormData({maxDataSize: 5 * 1024 * 1024 * 1024});
@@ -75,7 +85,9 @@ const uploadDelta = async (fileId, deltaNum, deltaFile) => {
     });
 };
 
-// 合并文件
+/**
+ * 合并文件
+ */
 const patch = async (fileId, md5, deltaResult, partSize) => {
     await api.post('/bimserver/sfs/v3/delta/patch', {fileId, md5, deltaResult, partSize})
         .catch(err => {
