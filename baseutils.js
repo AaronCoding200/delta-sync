@@ -79,9 +79,9 @@ const getMd5Index = (md5AndIndex) => {
 
 const judgeStartEnd = (start, end) => {
     if (start === end) {
-        return "" + start + "";
+        return start.toString();
     } else {
-        return "[" + start + ',' + end + "]";
+        return `[${start},${end}]`;
     }
 }
 
@@ -137,10 +137,14 @@ const handleCheckResult = (checkResult, hitRate) => {
     }
 }
 
-const objToMap = (obj) => {
+const objToMap = (obj, keyToNumber) => {
     let map = new Map();
     for (const k of Object.keys(obj)) {
-        map.set(Number(k), obj[k]);
+        if (keyToNumber) {
+            map.set(Number(k), obj[k]);
+        } else {
+            map.set(k, obj[k]);
+        }
     }
     return map;
 }

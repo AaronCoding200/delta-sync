@@ -7,7 +7,7 @@ const fs = require('fs')
 /**
  * 文件夹名称
  */
-const FOLDER_NAME = 'rvt';
+const FOLDER_NAME = 'obmx';
 
 /**
  * 一次上传最大并发数

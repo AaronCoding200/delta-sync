@@ -4,7 +4,7 @@ const baseutils = require('./baseutils')
 
 const getDelta = (newFilePath, sign, partSize) => {
 
-    sign = baseutils.objToMap(sign)
+    sign = baseutils.objToMap(sign, true)
 
     const file = fs.readFileSync(newFilePath)
 
