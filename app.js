@@ -7,10 +7,10 @@ const fs = require('fs')
 /**
  * 文件夹名称
  */
-const FOLDER_NAME = 'obmx';
+const FOLDER_NAME = 'rvt';
 
 /**
- * 一次上传最大并发数
+ * 一次可提交的上传最大并发数
  */
 const TCP_MAX_ONCE_UPLOAD = 10;
 
