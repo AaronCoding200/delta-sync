@@ -85,24 +85,24 @@ const judgeStartEnd = (start, end) => {
     }
 }
 
-const handleCheckResult = (checkResult) => {
-    const deltaParts = [];
-    const deltaResult = [];
+const handleCheckResult = (checkResult, hitRate) => {
+    const parts = [];
+    const result = [];
     let start = null, end = null;
 
     for (let i = 0; i < checkResult.length; i++) {
         if (checkResult[i] instanceof Buffer) {
             if (start !== null) {
-                deltaResult.push(judgeStartEnd(start, end));
+                result.push(judgeStartEnd(start, end));
                 start = null;
                 end = null;
             }
 
-            deltaParts.push({
-                num: deltaResult.length,
+            parts.push({
+                num: result.length,
                 part: checkResult[i]
             });
-            deltaResult.push('~');
+            result.push('~');
             continue;
         }
 
@@ -115,7 +115,7 @@ const handleCheckResult = (checkResult) => {
                 continue;
             }
 
-            deltaResult.push(judgeStartEnd(start, end));
+            result.push(judgeStartEnd(start, end));
 
             start = num;
             end = num;
@@ -127,14 +127,23 @@ const handleCheckResult = (checkResult) => {
     }
 
     if (start !== null) {
-        deltaResult.push(judgeStartEnd(start, end));
+        result.push(judgeStartEnd(start, end));
     }
 
     return {
-        deltaParts,
-        deltaResult
+        parts,
+        result,
+        hitRate: Math.round(((hitRate) * 10000)) / 100.00.toFixed(2) + '%'
     }
-};
+}
+
+const objToMap = (obj) => {
+    let map = new Map();
+    for (const k of Object.keys(obj)) {
+        map.set(Number(k), obj[k]);
+    }
+    return map;
+}
 
 module.exports = {
     calcChecksum,
@@ -145,4 +154,5 @@ module.exports = {
     getMd5Index,
     judgeStartEnd,
     handleCheckResult,
+    objToMap
 }

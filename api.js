@@ -11,7 +11,10 @@ const api = axios.create({
 });
 
 // 获取上传url
-const getUploadUrl = async (projectId, folderId) => {
+const getUploadUrl = async () => {
+    const projectId = '4vdhw9xZQLV'
+    const folderId = '@root'
+
     const {data} = await api.get('/bimserver/sfs/v3/uploadUrl', {
         params: {
             "type": 5,
@@ -20,7 +23,7 @@ const getUploadUrl = async (projectId, folderId) => {
             "expire": 600000
         }
     });
-    return data
+    return {uploadUrl: data.data.uploadUrl, signature: data.data.signature}
 }
 
 // 全量上传

@@ -4,51 +4,65 @@ const {getDelta} = require('./calculate_delta')
 const {calcMd5} = require('./baseutils')
 const fs = require('fs')
 
-const oldFilePath = '对比数据/pdf/old'
-const newFilePath = '对比数据/pdf/new'
+/**
+ * 文件夹名称
+ */
+const FOLDER_NAME = 'rvt2';
 
-const projectId = '4vdhw9xZQLV'
-const folderId = '@root'
+/**
+ * 一次上传最大并发数
+ */
 const TCP_MAX_ONCE_UPLOAD = 10;
-const partSize = 100 * 1024
+
+/**
+ * 分片大小， 100k
+ */
+const PART_SIZE = 100 * 1024;
+
+const OLD_FILEPATH = `对比数据/${FOLDER_NAME}/old`
+const NEW_FILEPATH = `对比数据/${FOLDER_NAME}/new`
 
 let fileId;
 
 const fullUpload = async () => {
-    console.time('全量上传')
-    // 1. 获取上传url
-    const getUploadUrlResult = await api.getUploadUrl(projectId, folderId)
+    console.warn("----------全量上传---------- [原文件大小：" + (fs.readFileSync(OLD_FILEPATH).length / 1024 / 1024).toFixed(2) + 'MB]')
 
-    // 2. 全量上传文件
-    const fullUploadResult = await api.fullUpload(getUploadUrlResult.data.uploadUrl, getUploadUrlResult.data.signature, oldFilePath)
+    console.time('1.获取上传url')
+    const {uploadUrl, signature} = await api.getUploadUrl()
+    console.timeEnd('1.获取上传url')
+
+    console.time('2.上传完整文件')
+    const fullUploadResult = await api.fullUpload(uploadUrl, signature, OLD_FILEPATH)
     fileId = fullUploadResult.data.id
+    console.timeEnd('2.上传完整文件')
 
-    // 3. 上传sign文件
-    await api.uploadSign(fileId, getSign(oldFilePath, partSize))
-    console.timeEnd('全量上传')
+    console.time('3.上传sign')
+    await api.uploadSign(fileId, getSign(OLD_FILEPATH, PART_SIZE))
+    console.timeEnd('3.上传sign')
 }
 
 const deltaUpload = async () => {
-    console.time('下载sign文件')
+    console.warn("\n----------增量上传---------- [新文件大小：" + (fs.readFileSync(NEW_FILEPATH).length / 1024 / 1024).toFixed(2) + 'MB]')
+    console.time('1.下载sign文件')
     const sign = await api.downloadSign(fileId);
-    console.timeEnd('下载sign文件')
+    console.timeEnd('1.下载sign文件')
 
-    console.time('计算delta')
-    const delta = getDelta(newFilePath, sign, partSize)
+    console.time('2.计算delta')
+    const delta = getDelta(NEW_FILEPATH, sign, PART_SIZE)
+    console.timeEnd('2.计算delta')
     console.log('delta:', delta)
-    console.timeEnd('计算delta')
 
-    console.time('上传delta')
-    await uploadDeltaPart(0, delta.deltaParts);
-    console.timeEnd('上传delta')
+    console.time('3.上传delta')
+    await uploadDeltaPart(0, delta.parts);
+    console.timeEnd('3.上传delta')
 
-    console.time('合并')
-    await api.patch(fileId, calcMd5(fs.readFileSync(newFilePath)), delta.deltaResult, partSize);
-    console.timeEnd('合并')
+    console.time('4.合并')
+    await api.patch(fileId, calcMd5(fs.readFileSync(NEW_FILEPATH)), delta.result, PART_SIZE);
+    console.timeEnd('4.合并')
 
-    console.time('上传sign')
-    await api.uploadSign(fileId, getSign(newFilePath, partSize));
-    console.timeEnd('上传sign')
+    console.time('5.上传sign')
+    await api.uploadSign(fileId, getSign(NEW_FILEPATH, PART_SIZE));
+    console.timeEnd('5.上传sign')
 }
 
 const uploadDeltaPart = async (index, deltaParts) => {
@@ -85,9 +99,13 @@ const uploadDeltaPart = async (index, deltaParts) => {
 }
 
 const start = async () => {
+    console.time('总耗时')
     await fullUpload();
+    console.timeEnd('总耗时')
 
+    console.time('总耗时')
     await deltaUpload()
+    console.timeEnd('总耗时')
 }
 
 _ = start()
