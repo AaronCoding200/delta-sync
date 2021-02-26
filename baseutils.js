@@ -51,29 +51,29 @@ const getChunks = (file, partSize) => {
     return chunks;
 }
 
-const checkKey = (sign, checksum, md5Value) => {
+const checkKey = (sign, checksum, md5AtIndex) => {
     if (sign[checksum]) {
         let sameIndex = 1;
         while (true) {
             const key = checksum + '@' + sameIndex;
 
             if (!sign[key]) {
-                sign[key] = md5Value;
+                sign[key] = md5AtIndex;
                 break;
             }
 
             sameIndex++;
         }
     } else {
-        sign[checksum] = md5Value;
+        sign[checksum] = md5AtIndex;
     }
 }
 
-const getMd5Index = (md5AndIndex) => {
-    const index = md5AndIndex.lastIndexOf('@');
+const getMd5Index = (md5AtIndex) => {
+    const index = md5AtIndex.lastIndexOf('@');
     return {
-        md5: md5AndIndex.slice(0, index),
-        index: md5AndIndex.slice(index + 1)
+        md5: md5AtIndex.slice(0, index),
+        index: md5AtIndex.slice(index + 1)
     }
 }
 

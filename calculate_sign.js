@@ -15,10 +15,10 @@ const getSign = (filePath, partSize) => {
 
         const chunk = chunkList[count]
 
-        const md5Value = baseutils.calcMd5(chunk) + '@' + count
+        const md5AtIndex = baseutils.calcMd5(chunk) + '@' + count
         const checksum = baseutils.calcChecksum(chunk, 0, chunk.length)
 
-        baseutils.checkKey(sign, checksum, md5Value)
+        baseutils.checkKey(sign, checksum, md5AtIndex)
 
         count++
     }
